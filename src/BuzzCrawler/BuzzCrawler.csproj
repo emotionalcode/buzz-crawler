@@ -85,6 +85,7 @@
     <Compile Include="Rss\RssCrawler.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BuzzCrawler.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
