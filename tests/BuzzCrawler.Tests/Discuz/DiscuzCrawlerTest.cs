@@ -6,8 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Abot.Poco;
-using Microsoft.QualityTools.Testing.Fakes;
-using BuzzCrawler.Discuz.Fakes;
 using System.Text.RegularExpressions;
 
 namespace BuzzCrawler.Discuz.Tests
@@ -141,13 +139,13 @@ namespace BuzzCrawler.Discuz.Tests
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
             crawledPage.WebException = new System.Net.WebException("test");
-
-            using (ShimsContext.Create())
-            {
-                ShimDiscuzCrawler.AllInstances.DebugLogString = (discuzCrawler, txt) =>
-                {
-                    Assert.AreEqual($"Crawl of page failed - web exception {crawledPage.Uri.AbsoluteUri} : {crawledPage.WebException.ToString()}", txt);
-                };
+            
+            //using (ShimsContext.Create())
+            //{
+            //    ShimDiscuzCrawler.AllInstances.DebugLogString = (discuzCrawler, txt) =>
+            //    {
+            //        Assert.AreEqual($"Crawl of page failed - web exception {crawledPage.Uri.AbsoluteUri} : {crawledPage.WebException.ToString()}", txt);
+            //    };
 
                 var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
                 {
@@ -158,8 +156,13 @@ namespace BuzzCrawler.Discuz.Tests
                     CrawleRange = new CrawleRange() { StartArticleNo = 0, MaxListPageNo = 10 }
                 });
 
+                crawler.OnNewBuzzCrawled += (result) =>
+                {
+                    Assert.Fail();
+                };
+
                 crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
-            }
+            //}
         }
 
         [TestMethod]
@@ -168,12 +171,12 @@ namespace BuzzCrawler.Discuz.Tests
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
             crawledPage.HttpWebResponse = new HttpWebResponseWrapper(System.Net.HttpStatusCode.BadGateway, "html", null, null);
 
-            using (ShimsContext.Create())
-            {
-                ShimDiscuzCrawler.AllInstances.DebugLogString = (discuzCrawler, txt) =>
-                {
-                    Assert.AreEqual($"Crawl of page failed - status {crawledPage.Uri.AbsoluteUri} : {crawledPage.HttpWebResponse.StatusCode.ToString()}", txt);
-                };
+            //using (ShimsContext.Create())
+            //{
+            //    ShimDiscuzCrawler.AllInstances.DebugLogString = (discuzCrawler, txt) =>
+                //{
+                //    Assert.AreEqual($"Crawl of page failed - status {crawledPage.Uri.AbsoluteUri} : {crawledPage.HttpWebResponse.StatusCode.ToString()}", txt);
+                //};
 
                 var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
                 {
@@ -183,8 +186,13 @@ namespace BuzzCrawler.Discuz.Tests
                     DiscuzVersion = DiscuzVersion.X2,
                     CrawleRange = new CrawleRange() { StartArticleNo = 0, MaxListPageNo = 10 }
                 });
+
+                crawler.OnNewBuzzCrawled += (result) =>
+                {
+                    Assert.Fail();
+                };
                 crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
-            }
+            //}
         }
 
         [TestMethod]
@@ -192,25 +200,22 @@ namespace BuzzCrawler.Discuz.Tests
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=777&orderby=dateline&filter=author&page=1"));
             crawledPage.HttpWebResponse = new HttpWebResponseWrapper(System.Net.HttpStatusCode.OK, "html", null, null);
-
-            using (ShimsContext.Create())
+            
+            var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
             {
-                var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
-                {
-                    BaseUrl = "http://www.discuzsample.com",
-                    ForumId = 777,
-                    CrawleHistoryRepository = new DummyCrawleHistoryRepository(false),
-                    DiscuzVersion = DiscuzVersion.X2,
-                    CrawleRange = new CrawleRange() { StartArticleNo = 0, MaxListPageNo = 10 }
-                });
+                BaseUrl = "http://www.discuzsample.com",
+                ForumId = 777,
+                CrawleHistoryRepository = new DummyCrawleHistoryRepository(false),
+                DiscuzVersion = DiscuzVersion.X2,
+                CrawleRange = new CrawleRange() { StartArticleNo = 0, MaxListPageNo = 10 }
+            });
 
-                crawler.OnNewBuzzCrawled += a =>
-                {
-                    Assert.Fail();
-                };
+            crawler.OnNewBuzzCrawled += a =>
+            {
+                Assert.Fail();
+            };
 
-                crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
-            }
+            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
