@@ -135,7 +135,7 @@ namespace BuzzCrawler.Discuz.Tests
 
         #region pageCrawlCompletedAsync
         [TestMethod]
-        public void pageCrawlCompletedAsync_webException_ignore()
+        public void pageCrawlCompleted_webException_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
             crawledPage.WebException = new System.Net.WebException("test");
@@ -161,12 +161,12 @@ namespace BuzzCrawler.Discuz.Tests
                     Assert.Fail();
                 };
 
-                crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+                crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             //}
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_httpResponse502_ignore()
+        public void pageCrawlCompleted_httpResponse502_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
             crawledPage.HttpWebResponse = new HttpWebResponseWrapper(System.Net.HttpStatusCode.BadGateway, "html", null, null);
@@ -191,12 +191,12 @@ namespace BuzzCrawler.Discuz.Tests
                 {
                     Assert.Fail();
                 };
-                crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+                crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             //}
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_listPage_ignore()
+        public void pageCrawlCompleted_listPage_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=777&orderby=dateline&filter=author&page=1"));
             crawledPage.HttpWebResponse = new HttpWebResponseWrapper(System.Net.HttpStatusCode.OK, "html", null, null);
@@ -215,11 +215,11 @@ namespace BuzzCrawler.Discuz.Tests
                 Assert.Fail();
             };
 
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_documentIsNull_ignore()
+        public void pageCrawlCompleted_documentIsNull_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
             crawledPage.HttpWebResponse = new HttpWebResponseWrapper(System.Net.HttpStatusCode.OK, "html", null, null);
@@ -238,11 +238,11 @@ namespace BuzzCrawler.Discuz.Tests
             {
                 Assert.Fail();
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_unnecessaryHiddenDiv_removed()
+        public void pageCrawlCompleted_unnecessaryHiddenDiv_removed()
         {
             var testContent = @"
                             <div id=""thread_subject"">title</div>
@@ -303,11 +303,11 @@ namespace BuzzCrawler.Discuz.Tests
             {
                 Assert.AreEqual("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_unnecessaryJammerText_removed()
+        public void pageCrawlCompleted_unnecessaryJammerText_removed()
         {
             var testContent = @"
                             <div id=""thread_subject"">title</div>
@@ -336,11 +336,11 @@ namespace BuzzCrawler.Discuz.Tests
             {
                 Assert.AreEqual("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_unnecessarySignitureText_removed()
+        public void pageCrawlCompleted_unnecessarySignitureText_removed()
         {
             var testContent = @"
                             <div id=""thread_subject"">title</div>
@@ -369,11 +369,11 @@ namespace BuzzCrawler.Discuz.Tests
             {
                 Assert.AreEqual("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_imgTagSrcAttr_replace()
+        public void pageCrawlCompleted_imgTagSrcAttr_replace()
         {
             var expected = @"如题有些人就是矫情<br>
                     <img id=""aimg_37446495"" file=""http://www.discuzsample.com/forum/201610/24/060757jwdhc5b8wwp4e8je.jpg"" class=""zoom"" onclick=""zoom(this, this.src)"" width=""519"" inpost=""1"" alt=""4OHC@Q(2`3RW`77]{X[UVTK.jpg"" title=""4OHC@Q(2`3RW`77]{X[UVTK.jpg"" onmouseover=""showMenu({'ctrlid':this.id,'pos':'12'})"" initialized=""true"" src=""http://www.discuzsample.com/forum/201610/24/060757jwdhc5b8wwp4e8je.jpg"">";
@@ -398,12 +398,12 @@ namespace BuzzCrawler.Discuz.Tests
             {
                 Assert.AreEqual(getTrimmedText(expected), getTrimmedText(result.Content));
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
         #endregion
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_parseError_ignore()
+        public void pageCrawlCompleted_parseError_ignore()
         {
             var expected = @"如题有些人就是矫情<br>
                     <img id=""aimg_37446495"" file=""http://www.discuzsample.com/forum/201610/24/060757jwdhc5b8wwp4e8je.jpg"" class=""zoom"" onclick=""zoom(this, this.src)"" width=""519"" inpost=""1"" alt=""4OHC@Q(2`3RW`77]{X[UVTK.jpg"" title=""4OHC@Q(2`3RW`77]{X[UVTK.jpg"" onmouseover=""showMenu({'ctrlid':this.id,'pos':'12'})"" initialized=""true"" src=""http://www.discuzsample.com/forum/201610/24/060757jwdhc5b8wwp4e8je.jpg"">";
@@ -429,11 +429,11 @@ namespace BuzzCrawler.Discuz.Tests
             {
                 Assert.Fail();
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_realDuowanBuzz()
+        public void pageCrawlCompleted_realDuowanBuzz()
         {
             var expected = new Buzz()
             {
@@ -483,11 +483,11 @@ namespace BuzzCrawler.Discuz.Tests
                 Assert.AreEqual(expected.WriteDate, result.WriteDate);
                 Assert.AreEqual(expected.WriterId, result.WriterId);
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         [TestMethod]
-        public void pageCrawlCompletedAsync_realColgBuzz()
+        public void pageCrawlCompleted_realColgBuzz()
         {
             var expected = new Buzz()
             {
@@ -545,7 +545,7 @@ namespace BuzzCrawler.Discuz.Tests
                 Assert.AreEqual(expected.WriteDate, result.WriteDate);
                 Assert.AreEqual(expected.WriterId, result.WriterId);
             };
-            crawler.pageCrawlCompletedAsync(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
         private string getTrimmedText(string str)

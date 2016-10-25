@@ -41,7 +41,7 @@ namespace BuzzCrawler.Discuz
 
             PoliteWebCrawler crawler = new PoliteWebCrawler(null, null, null, null, null, new Abot.Core.CSQueryHyperlinkParser(), null, null, null);
             crawler.ShouldCrawlPage(shouldCrawlPage);
-            crawler.PageCrawlCompletedAsync += pageCrawlCompletedAsync;
+            crawler.PageCrawlCompletedAsync += pageCrawlCompleted;
 
             CrawlResult result = crawler.Crawl(new Uri(option.ArticleListPageUrl + "1"));
             if (result.ErrorOccurred)
@@ -72,7 +72,7 @@ namespace BuzzCrawler.Discuz
             return new CrawlDecision { Allow = false, Reason = "not a target page" };
         }
 
-        internal void pageCrawlCompletedAsync(object sender, PageCrawlCompletedArgs e)
+        internal void pageCrawlCompleted(object sender, PageCrawlCompletedArgs e)
         {
             CrawledPage crawledPage = e.CrawledPage;
 
