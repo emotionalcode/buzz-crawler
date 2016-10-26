@@ -5,4 +5,4 @@ install:
   - nuget install xunit.runners -Version 1.9.2 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release BuzzCrawler.sln
-  - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./BuzzCrawler.Tests/bin/Release/BuzzCrawler.Tests.dll
+  - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./src/BuzzCrawler.Tests/bin/Release/BuzzCrawler.Tests.dll
