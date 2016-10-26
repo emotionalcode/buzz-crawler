@@ -4,7 +4,7 @@ AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/1xu16kovc
 
 Travis:  [![Build Status](https://travis-ci.org/emotionalcode/buzz-crawler.svg?branch=master)](https://travis-ci.org/emotionalcode/buzz-crawler)
 
-### install
+### Install
 To install BuzzCrawler, run the following command in the [Package Manager Console](https://docs.nuget.org/docs/start-here/using-the-package-manager-console)
 ```
 Install-Package BuzzCrawler
