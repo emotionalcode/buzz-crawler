@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using BuzzCrawler.Discuz;
+﻿using BuzzCrawler.Discuz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Abot.Poco;
 using System.Text.RegularExpressions;
+using Xunit;
 
 namespace BuzzCrawler.Discuz.Tests
 {
-    [TestClass()]
     public class DiscuzCrawlerTests
     {
         #region shouldCrawlPage
-        [TestMethod()]
+        [Fact]
         public void shouldCrawlPage_neitherArticleOrListPage_allowFalse()
         {
             var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -27,10 +26,10 @@ namespace BuzzCrawler.Discuz.Tests
             });
 
             var actual = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://test.com") }, null);
-            Assert.IsFalse(actual.Allow);
+            Assert.False(actual.Allow);
         }
 
-        [TestMethod()]
+        [Fact]
         public void shouldCrawlPage_listPage_outOfScope_allowFalse()
         {
             var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -43,12 +42,12 @@ namespace BuzzCrawler.Discuz.Tests
             });
 
             var actual = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=777&orderby=dateline&filter=author&page=11") }, null);
-            Assert.IsFalse(actual.Allow);
+            Assert.False(actual.Allow);
             var actual2 = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=777&orderby=dateline&filter=author&page=12") }, null);
-            Assert.IsFalse(actual2.Allow);
+            Assert.False(actual2.Allow);
         }
 
-        [TestMethod()]
+        [Fact]
         public void shouldCrawlPage_listPage_inScope_allowTrue()
         {
             var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -60,12 +59,12 @@ namespace BuzzCrawler.Discuz.Tests
                 CrawleRange = new CrawleRange() { MaxListPageNo = 10 }
             });
             var actual = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=777&orderby=dateline&filter=author&page=10") }, null);
-            Assert.IsTrue(actual.Allow);
+            Assert.True(actual.Allow);
             var actual2 = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=777&orderby=dateline&filter=author&page=9") }, null);
-            Assert.IsTrue(actual2.Allow);
+            Assert.True(actual2.Allow);
         }
 
-        [TestMethod()]
+        [Fact]
         public void shouldCrawlPage_articlePage_outOfScope_allowFalse()
         {
             var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -78,13 +77,13 @@ namespace BuzzCrawler.Discuz.Tests
             });
 
             var actual = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=viewthread&tid=10") }, null);
-            Assert.IsFalse(actual.Allow);
+            Assert.False(actual.Allow);
 
             var actual2 = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=viewthread&tid=9") }, null);
-            Assert.IsFalse(actual2.Allow);
+            Assert.False(actual2.Allow);
         }
 
-        [TestMethod()]
+        [Fact]
         public void shouldCrawlPage_articlePage_inScope_allowTrue()
         {
             var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -97,10 +96,10 @@ namespace BuzzCrawler.Discuz.Tests
             });
 
             var actual = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=viewthread&tid=11") }, null);
-            Assert.IsTrue(actual.Allow);
+            Assert.True(actual.Allow);
         }
 
-        [TestMethod()]
+        [Fact]
         public void shouldCrawlPage_articlePage_alreadyCrawled_allowFalse()
         {
             var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -113,10 +112,10 @@ namespace BuzzCrawler.Discuz.Tests
             });
 
             var actual = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=viewthread&tid=1") }, null);
-            Assert.IsFalse(actual.Allow);
+            Assert.False(actual.Allow);
         }
 
-        [TestMethod()]
+        [Fact]
         public void shouldCrawlPage_articlePage_withComments_allowFalse()
         {
             var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -129,12 +128,12 @@ namespace BuzzCrawler.Discuz.Tests
             });
 
             var actual = crawler.shouldCrawlPage(new PageToCrawl() { Uri = new Uri("http://www.discuzsample.com/forum.php?mod=viewthread&tid=1&page=2") }, null);
-            Assert.IsFalse(actual.Allow);
+            Assert.False(actual.Allow);
         }
         #endregion
 
         #region pageCrawlCompletedAsync
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_webException_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
@@ -144,7 +143,7 @@ namespace BuzzCrawler.Discuz.Tests
             //{
             //    ShimDiscuzCrawler.AllInstances.DebugLogString = (discuzCrawler, txt) =>
             //    {
-            //        Assert.AreEqual($"Crawl of page failed - web exception {crawledPage.Uri.AbsoluteUri} : {crawledPage.WebException.ToString()}", txt);
+            //        Assert.Equal($"Crawl of page failed - web exception {crawledPage.Uri.AbsoluteUri} : {crawledPage.WebException.ToString()}", txt);
             //    };
 
                 var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -158,14 +157,14 @@ namespace BuzzCrawler.Discuz.Tests
 
                 crawler.OnNewBuzzCrawled += (result) =>
                 {
-                    Assert.Fail();
+                    Assert.True(false, "web exception throwed, should be ignored");
                 };
 
                 crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             //}
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_httpResponse502_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
@@ -175,7 +174,7 @@ namespace BuzzCrawler.Discuz.Tests
             //{
             //    ShimDiscuzCrawler.AllInstances.DebugLogString = (discuzCrawler, txt) =>
                 //{
-                //    Assert.AreEqual($"Crawl of page failed - status {crawledPage.Uri.AbsoluteUri} : {crawledPage.HttpWebResponse.StatusCode.ToString()}", txt);
+                //    Assert.Equal($"Crawl of page failed - status {crawledPage.Uri.AbsoluteUri} : {crawledPage.HttpWebResponse.StatusCode.ToString()}", txt);
                 //};
 
                 var crawler = new DiscuzCrawler(new DiscuzCrawleOption()
@@ -189,13 +188,13 @@ namespace BuzzCrawler.Discuz.Tests
 
                 crawler.OnNewBuzzCrawled += (result) =>
                 {
-                    Assert.Fail();
+                    Assert.True(false, "http response was 502, should be ignored");
                 };
                 crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             //}
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_listPage_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=777&orderby=dateline&filter=author&page=1"));
@@ -212,13 +211,13 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += a =>
             {
-                Assert.Fail();
+                Assert.True(false, "list page, should be ignored");
             };
 
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_documentIsNull_ignore()
         {
             var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com"));
@@ -236,12 +235,12 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.Fail();
+                Assert.True(false, "document is null, should be ignored");
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_unnecessaryHiddenDiv_removed()
         {
             var testContent = @"
@@ -301,12 +300,12 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.AreEqual("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
+                Assert.Equal("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_unnecessaryJammerText_removed()
         {
             var testContent = @"
@@ -334,12 +333,12 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.AreEqual("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
+                Assert.Equal("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_unnecessarySignitureText_removed()
         {
             var testContent = @"
@@ -367,12 +366,12 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.AreEqual("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
+                Assert.Equal("test<span>test</span>", Regex.Replace(result.Content.Trim(), @"\t|\n|\r", string.Empty).Replace(" ", string.Empty));
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_imgTagSrcAttr_replace()
         {
             var expected = @"如题有些人就是矫情<br>
@@ -396,13 +395,13 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.AreEqual(getTrimmedText(expected), getTrimmedText(result.Content));
+                Assert.Equal(getTrimmedText(expected), getTrimmedText(result.Content));
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
         #endregion
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_parseError_ignore()
         {
             var expected = @"如题有些人就是矫情<br>
@@ -427,12 +426,12 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.Fail();
+                Assert.True(false, "when parse error, should be ignored");
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_realDuowanBuzz()
         {
             var expected = new Buzz()
@@ -476,17 +475,17 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.AreEqual(getTrimmedText(expected.Content), getTrimmedText(result.Content));
-                Assert.AreEqual(expected.ContentsNo, result.ContentsNo);
-                Assert.AreEqual(expected.Link, result.Link);
-                Assert.AreEqual(expected.Title, result.Title);
-                Assert.AreEqual(expected.WriteDate, result.WriteDate);
-                Assert.AreEqual(expected.WriterId, result.WriterId);
+                Assert.Equal(getTrimmedText(expected.Content), getTrimmedText(result.Content));
+                Assert.Equal(expected.ContentsNo, result.ContentsNo);
+                Assert.Equal(expected.Link, result.Link);
+                Assert.Equal(expected.Title, result.Title);
+                Assert.Equal(expected.WriteDate, result.WriteDate);
+                Assert.Equal(expected.WriterId, result.WriterId);
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }
 
-        [TestMethod]
+        [Fact]
         public void pageCrawlCompleted_realColgBuzz()
         {
             var expected = new Buzz()
@@ -510,7 +509,8 @@ namespace BuzzCrawler.Discuz.Tests
             };
             var testContent = @"<html><body><div class=""authi"">
 <img class=""authicn vm"" id=""authicon80077484"" src=""http://www.discuzsample.com/image/common/online_member.gif"" />
-<em id=""authorposton80077484"">发表于 2016-10-25 07:58</em><table cellspacing=""0"" cellpadding=""0""><tr><td class=""t_f"" id=""postmessage_80077484"">
+<em id=""authorposton80077484"">发表于 2016-10-25 07:58</em>
+<table cellspacing=""0"" cellpadding=""0""><tr><td class=""t_f"" id=""postmessage_80077484"">
 <table cellspacing=""0"" class=""t_table"" style=""width:75%"" bgcolor=""mediumslateblue""><tr><td><table cellspacing=""0"" class=""t_table"" style=""width:98%"" bgcolor=""mistyrose""><tr><td><img id=""aimg_wbswe"" onclick=""zoom(this, this.src, 0, 0, 0)"" class=""zoom"" file=""http://www.discuzsample.com/mypoco/myphoto/20161025/07/52350242201610250756233290499415347_000.jpg"" onmouseover=""img_onmouseoverfunc(this)"" lazyloadthumb=""1"" border=""0"" alt="""" /><br />
 </td></tr></td></tr></table><br />
 <br />
@@ -538,12 +538,12 @@ namespace BuzzCrawler.Discuz.Tests
 
             crawler.OnNewBuzzCrawled += (result) =>
             {
-                Assert.AreEqual(getTrimmedText(expected.Content), getTrimmedText(result.Content));
-                Assert.AreEqual(expected.ContentsNo, result.ContentsNo);
-                Assert.AreEqual(expected.Link, result.Link);
-                Assert.AreEqual(expected.Title, result.Title);
-                Assert.AreEqual(expected.WriteDate, result.WriteDate);
-                Assert.AreEqual(expected.WriterId, result.WriterId);
+                Assert.Equal(getTrimmedText(expected.Content), getTrimmedText(result.Content));
+                Assert.Equal(expected.ContentsNo, result.ContentsNo);
+                Assert.Equal(expected.Link, result.Link);
+                Assert.Equal(expected.Title, result.Title);
+                Assert.Equal(expected.WriteDate, result.WriteDate);
+                Assert.Equal(expected.WriterId, result.WriterId);
             };
             crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
         }

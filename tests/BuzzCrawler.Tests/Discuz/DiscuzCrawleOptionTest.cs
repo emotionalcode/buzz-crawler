@@ -1,13 +1,12 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BuzzCrawler.Discuz;
+using Xunit;
 
 namespace BuzzCrawler.Tests.Discuz
 {
-    [TestClass]
     public class DiscuzCrawleOptionTest
     {
-        [TestMethod]
+        [Fact]
         public void ArticlePageUrl_getter()
         {
             var expected = "http://www.discuzsample.com/forum.php?mod=viewthread&tid=";
@@ -17,10 +16,10 @@ namespace BuzzCrawler.Tests.Discuz
             {
                 BaseUrl = "http://www.discuzsample.com"
             };
-            Assert.AreEqual(expected, crawleOption.ArticlePageUrl);
+            Assert.Equal(expected, crawleOption.ArticlePageUrl);
         }
 
-        [TestMethod()]
+        [Fact]
         public void ArticleListPageUrl_getter()
         {
             var expected = "http://www.discuzsample.com/forum.php?mod=forumdisplay&fid=100&orderby=dateline&filter=author&page=";
@@ -29,7 +28,7 @@ namespace BuzzCrawler.Tests.Discuz
                 BaseUrl = "http://www.discuzsample.com",
                 ForumId = 100
             };
-            Assert.AreEqual(expected, crawleOption.ArticleListPageUrl);
+            Assert.Equal(expected, crawleOption.ArticleListPageUrl);
         }
     }
 }
