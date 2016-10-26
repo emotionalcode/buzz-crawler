@@ -1,8 +1,8 @@
 
 # buzz-crawler
-AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/1xu16kovcr7do9xh?svg=true)](https://ci.appveyor.com/project/emotionalcode/buzz-crawler)
-
-Travis:  [![Build Status](https://travis-ci.org/emotionalcode/buzz-crawler.svg?branch=master)](https://travis-ci.org/emotionalcode/buzz-crawler)
+[![Build status](https://ci.appveyor.com/api/projects/status/1xu16kovcr7do9xh?svg=true)](https://ci.appveyor.com/project/emotionalcode/buzz-crawler)
+[![Build Status](https://travis-ci.org/emotionalcode/buzz-crawler.svg?branch=master)](https://travis-ci.org/emotionalcode/buzz-crawler)
+[![Coverage Status](https://coveralls.io/repos/github/emotionalcode/buzz-crawler/badge.svg?branch=master)](https://coveralls.io/github/emotionalcode/buzz-crawler?branch=master)
 
 ### Install
 To install BuzzCrawler, run the following command in the [Package Manager Console](https://docs.nuget.org/docs/start-here/using-the-package-manager-console)
