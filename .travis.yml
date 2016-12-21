@@ -1,2 +1,8 @@
 language: csharp
-solution: BuzzCrawler.sln
+solution: solution-name.sln
+install:
+  - nuget restore BuzzCrawler.sln
+  - nuget install xunit.runner.console -Version 2.1.0 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release BuzzCrawler.sln
+  - mono ./testrunner/xunit.runner.console.2.1.0/tools/xunit.console.exe ./tests/BuzzCrawler.Tests/bin/Release/BuzzCrawler.Tests.dll
