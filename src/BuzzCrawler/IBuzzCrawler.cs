@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BuzzCrawler
 {
-    interface IBuzzCrawler
+    public interface IBuzzCrawler
     {
         event Action<int, DateTime?> OnCrawleComplete;
         event Action<Buzz> OnNewBuzzCrawled;

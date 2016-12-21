@@ -1,4 +1,5 @@
-﻿using Abot.Crawler;
+﻿using Abot.Core;
+using Abot.Crawler;
 using Abot.Poco;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -10,158 +11,23 @@ using System.Web;
 
 namespace BuzzCrawler.Discuz
 {
-    public class DiscuzCrawler : IBuzzCrawler
+    public class DiscuzCrawler: BuzzCrawler
     {
         private const string HIDDEN_DIV_SELECTOR = @"[style*=""display:none""], [style*=""display: none""]";
         private const string JAMMER_TEXT_SELECTOR = ".jammer";
         private const string SIGNITURE_TEXT_SELECTOR = ".pstatus";
 
-        private object _syncRoot = new object();
-        private DateTime? lastestArticleWriteDate;
-        private int crawledCount = 0;
-        private readonly DiscuzCrawleOption option;
-
-        /// <summary>
-        /// event that is fired when an individual buzz has been crawled.
-        /// </summary>
-        public event Action<int, DateTime?> OnCrawleComplete;
-        /// <summary>
-        /// event that is fired when all buzz pages has been crawle completed.
-        /// </summary>
-        public event Action<Buzz> OnNewBuzzCrawled;
-        
-        public DiscuzCrawler(DiscuzCrawleOption option)
+        public DiscuzCrawler(DiscuzVersion version, CrawleTarget target, ICrawleHistoryRepository crawleHistoryRepository = null) 
+            : base(target, null, crawleHistoryRepository: crawleHistoryRepository)
         {
-            this.option = option;
+            base.selectors = this.getElementSelectors(version);
+            base.documentModify = modifyDocument;
         }
 
-        public void Crawle()
+        public void modifyDocument(IHtmlDocument document)
         {
-            DebugLog("start");
-
-            PoliteWebCrawler crawler = new PoliteWebCrawler(null, null, null, null, null, new Abot.Core.CSQueryHyperlinkParser(), null, null, null);
-            crawler.ShouldCrawlPage(shouldCrawlPage);
-            crawler.PageCrawlCompletedAsync += pageCrawlCompleted;
-
-            CrawlResult result = crawler.Crawl(new Uri(option.ArticleListPageUrl + "1"));
-            if (result.ErrorOccurred)
-            {
-                DebugLog($"Crawl of {result.RootUri.AbsoluteUri} completed with error: {result.ErrorException.Message}");
-            }
-            else
-            {
-                DebugLog($"Crawl of {result.RootUri.AbsoluteUri} completed without error.");
-                OnCrawleComplete?.Invoke(crawledCount, lastestArticleWriteDate);
-            }
-        }
-
-        internal CrawlDecision shouldCrawlPage(PageToCrawl pageToCrawl, CrawlContext crawlContext)
-        {
-            var uri = pageToCrawl.Uri;
-
-            if (isListPage(uri) && isListPageWithinTheScopeOfCrawle(uri))
-            {
-                return new CrawlDecision { Allow = true };
-            }
-
-            if (isArticlePage(uri) && isArticleWithinTheScopeOfCrawle(uri) && !option.CrawleHistoryRepository.IsAlreadyCrawled(uri))
-            {
-                return new CrawlDecision { Allow = true };
-            }
-
-            return new CrawlDecision { Allow = false, Reason = "not a target page" };
-        }
-
-        internal void pageCrawlCompleted(object sender, PageCrawlCompletedArgs e)
-        {
-            CrawledPage crawledPage = e.CrawledPage;
-
-            if(!isValid(crawledPage))
-            {
-                return;
-            }
-
-            DebugLog($"pageToCrawl : {crawledPage.Uri.AbsoluteUri}");
-
-            var document = new HtmlParser().Parse(crawledPage.Content.Text);
             removeUnnecessaryElements(document);
             replaceImgTagSrcAttribute(document);
-
-            Buzz crawledBuzz = null;
-            try
-            {
-                crawledBuzz = getBuzzFromDocument(document, crawledPage.Uri);
-            }
-            catch (Exception ex)
-            {
-                DebugLog($"buzz parsing error. exception:{ex.ToString()}");
-                return;
-            }
-
-            lock (_syncRoot)
-            {
-                if (option.CrawleHistoryRepository.IsAlreadyCrawled(crawledPage.Uri))
-                {
-                    DebugLog($"already crawled : {crawledPage.Uri.AbsoluteUri}");
-                    return;
-                }
-                option.CrawleHistoryRepository.SetCrawleComplete(crawledPage.Uri);
-            }
-
-            OnNewBuzzCrawled?.Invoke(crawledBuzz);
-
-            crawledCount++;
-            updateLastestArticleWriteDate(crawledBuzz);
-        }
-
-
-        #region private methods
-        private bool isArticlePage(Uri uri)
-        {
-            var isArticlePage = uri.AbsoluteUri.StartsWith(option.ArticlePageUrl);
-            var isArticlePageWithComments = uri.AbsoluteUri.Contains("&page=");
-            return isArticlePage && !isArticlePageWithComments;
-        }
-
-        private bool isListPage(Uri uri)
-        {
-            return uri.AbsoluteUri.StartsWith(option.ArticleListPageUrl);
-        }
-
-        private bool isListPageWithinTheScopeOfCrawle(Uri uri)
-        {
-            var pageNo = int.Parse(HttpUtility.ParseQueryString(uri.Query).Get("page"));
-            return option.CrawleRange.MaxListPageNo >= pageNo;
-        }
-
-        private bool isArticleWithinTheScopeOfCrawle(Uri uri)
-        {
-            return option.CrawleRange.StartArticleNo < getContentsNo(uri);
-        }
-
-        private bool isValid(CrawledPage crawledPage)
-        {
-            if (crawledPage.WebException != null)
-            {
-                DebugLog($"Crawl of page failed - web exception {crawledPage.Uri.AbsoluteUri} : {crawledPage.WebException.ToString()}");
-                return false;
-            }
-            if (crawledPage.HttpWebResponse.StatusCode != HttpStatusCode.OK)
-            {
-                DebugLog($"Crawl of page failed - status {crawledPage.Uri.AbsoluteUri} : {crawledPage.HttpWebResponse.StatusCode.ToString()}");
-                return false;
-            }
-            if (isListPage(crawledPage.Uri))
-            {
-                DebugLog($"this is list page, so pass analysis: {crawledPage.Uri.AbsoluteUri}");
-                return false;
-            }
-            if (string.IsNullOrEmpty(crawledPage.Content.Text))
-            {
-                return false;
-            }
-
-            return true;
         }
 
         private void removeUnnecessaryElements(IHtmlDocument document)
@@ -182,38 +48,30 @@ namespace BuzzCrawler.Discuz
             }
         }
 
-        private int getContentsNo(Uri uri)
+        private ElementSelectors getElementSelectors(DiscuzVersion version)
         {
-            return int.Parse(HttpUtility.ParseQueryString(uri.Query).Get("tid"));
-        }
-
-        private Buzz getBuzzFromDocument(IHtmlDocument document, Uri uri)
-        {
-            var crawledBuzz = new Buzz()
+            var selector = new ElementSelectors()
             {
-                Content = document.QuerySelector(".t_f")?.InnerHtml,
-                ContentsNo = getContentsNo(uri),
-                Link = "",
-                Title = document.QuerySelectorAll("#thread_subject").FirstOrDefault()?.InnerHtml,
-                WriteDate = DateTime.Parse(option.WriteDateSelector(document)).AddHours(1),
-                WriterId = document.QuerySelectorAll(".authi a").First().InnerHtml
+                ContentSelector = ".t_f",
+                TitleSelector = "#thread_subject",
+                WriterIdSelector = ".authi a"
             };
-            return crawledBuzz;
-        }
-
-        private void updateLastestArticleWriteDate(Buzz crawledResult)
-        {
-            if (lastestArticleWriteDate.HasValue == false || lastestArticleWriteDate.Value < crawledResult.WriteDate)
+            switch (version)
             {
-                lastestArticleWriteDate = crawledResult.WriteDate;
+                //case DiscuzVersion.X2:
+                //    selector.WriteDateSelector = d => DateTime.Parse(d.QuerySelectorAll(".authi").Skip(1).First().QuerySelector("span").Attributes["title"].Value).AddHours(1);
+                //    break;
+                case DiscuzVersion.X3_1:
+                    selector.WriteDateSelector = d => DateTime.Parse(d.QuerySelectorAll(".authi").Skip(1).First().QuerySelector("em").InnerHtml.Replace("发表于 ", "")).AddHours(1);
+                    break;
+                case DiscuzVersion.X2:
+                case DiscuzVersion.X3_2:
+                    selector.WriteDateSelector = d => DateTime.Parse(d.QuerySelectorAll(".authi").Skip(1).First().QuerySelector("span[title]").Attributes["title"].Value).AddHours(1);
+                    break;
+                default:
+                    throw new Exception($"{version} is not supported");
             }
+            return selector;
         }
-
-        [Conditional("DEBUG")]
-        void DebugLog(string txt)
-        {
-            Console.WriteLine(txt);
-        }
-        #endregion
     }
 }
