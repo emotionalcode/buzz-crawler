@@ -14,4 +14,7 @@
     <copyright>Copyright 2016</copyright>
     <tags></tags>
   </metadata>
+  <files>
+    <file src="bin\Release\net45\BuzzCrawler.dll" target="lib\net45\BuzzCrawler.dll" />
+  </files>
 </package>
