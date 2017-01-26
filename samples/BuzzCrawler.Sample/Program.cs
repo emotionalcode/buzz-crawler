@@ -50,6 +50,13 @@ namespace BuzzCrawler.Sample
             crawler.OnNewBuzzCrawled += buzz => Console.WriteLine($"buzz crawled{Environment.NewLine}{JsonConvert.SerializeObject(buzz)}");
             crawler.Crawle();
 
+
+            //var rep = new InMemoryCrawleHistoryRepository();
+            //var crawler = new NaverBlogCrawler("제주", "clientId", "clientSecret", rep);
+
+            //crawler.OnNewBuzzCrawled += buzz => Console.WriteLine($"buzz crawled{Environment.NewLine}{JsonConvert.SerializeObject(buzz)}");
+            //crawler.Crawle();
+
             Console.ReadLine();
         }
     }
