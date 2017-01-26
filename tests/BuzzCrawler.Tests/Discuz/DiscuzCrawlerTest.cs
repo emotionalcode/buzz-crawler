@@ -157,6 +157,41 @@ namespace BuzzCrawler.Discuz.Tests
         }
 
         [Fact]
+        public void pageCrawlCompleted_unnecessaryAttachedImageSystemText_removed()
+        {
+            var crawledPage = new CrawledPage(new Uri("http://www.discuzsample.com/view.php?forumId=testForum&articleNo=1"))
+            {
+                HttpWebResponse = new HttpWebResponseWrapper(System.Net.HttpStatusCode.OK, "html", null, null),
+                Content = new PageContent() { Text = @"
+                <html><body>
+                    <div id=""thread_subject"">title</div>
+                    <div class=""authi""><a>writerId</a></div>
+                    <div class=""authi""><span title=""2016-10-24 00:00:00""></span></div>
+                    <div class=""t_f"">
+                        test
+                        <div class=""pstatus"">jammerText</div>
+                        <div class='pstatus anotherClass'>jammerText</div>
+                        <span>test</span>
+                        <a href=""member.php?mod=logging&amp;action=login"" onclick=""showWindow('login', this.href+'&amp;referer='+encodeURIComponent(location));"">登录/注册后可看大图</a>
+                    </div>
+                </body></html>" }
+            };
+
+            AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
+
+            var crawler = new DiscuzCrawler(DiscuzVersion.X2, getTestTarget(), null);
+            crawler.OnNewBuzzCrawled += (result) =>
+            {
+                var refinedContent = getTrimmedText(result.Content);
+                refinedContent.ShouldBeEquivalentTo("test<span>test</span>", "because signiture text was removed");
+                stopWaitHandle.Set();
+            };
+
+            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            stopWaitHandle.WaitOne();
+        }
+
+        [Fact]
         public void pageCrawlCompleted_imgTagSrcAttr_replace()
         {
             var expected = @"如题有些人就是矫情<br>

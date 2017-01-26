@@ -16,6 +16,7 @@ namespace BuzzCrawler.Discuz
         private const string HIDDEN_DIV_SELECTOR = @"[style*=""display:none""], [style*=""display: none""]";
         private const string JAMMER_TEXT_SELECTOR = ".jammer";
         private const string SIGNITURE_TEXT_SELECTOR = ".pstatus";
+        private const string LOGIN_LINK_SELECTOR = @"a[href*=""member.php?mod=logging&action=login""]";
 
         public DiscuzCrawler(DiscuzVersion version, CrawleTarget target, ICrawleHistoryRepository crawleHistoryRepository = null) 
             : base(target, null, crawleHistoryRepository: crawleHistoryRepository)
@@ -32,7 +33,7 @@ namespace BuzzCrawler.Discuz
 
         private void removeUnnecessaryElements(IHtmlDocument document)
         {
-            var unnecessaryElements = document.QuerySelectorAll($"{HIDDEN_DIV_SELECTOR}, {JAMMER_TEXT_SELECTOR}, {SIGNITURE_TEXT_SELECTOR}");
+            var unnecessaryElements = document.QuerySelectorAll($"{HIDDEN_DIV_SELECTOR}, {JAMMER_TEXT_SELECTOR}, {SIGNITURE_TEXT_SELECTOR}, {LOGIN_LINK_SELECTOR}");
             foreach (var element in unnecessaryElements)
             {
                 element.Remove();
