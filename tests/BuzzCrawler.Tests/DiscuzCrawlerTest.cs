@@ -14,13 +14,17 @@ namespace BuzzCrawler.Discuz.Tests
 {
     public class DiscuzCrawlerTests
     {
-        private CrawleTarget getTestTarget(int maxListPageNo = 10, int startArticleNo = 0)
+        private BBSCrawleTarget getTestTarget(int maxListPageNo = 10, int startArticleNo = 0)
         {
-            return new CrawleTarget(
-                "http://www.discuzsample.com/view.php?forumId=&articleNo=", "articleNo",
-                "http://www.discuzsample.com/list.php?forumId=&pageNo=", "pageNo",
-                "testForum",
-                "forumId", maxListPageNo, startArticleNo);
+            return new BBSCrawleTarget(
+                articleUrl: "http://www.discuzsample.com/view.php?forumId=&articleNo=",
+                articleNoQuerystring: "articleNo",
+                listUrl: "http://www.discuzsample.com/list.php?forumId=&pageNo=",
+                pageNoQuerystring: "pageNo",
+                forumId: "testForum",
+                forumIdQuerystring: "forumId",
+                maxListPageNo: maxListPageNo,
+                startArticleNo: startArticleNo);
         }
 
         [Fact]
@@ -76,15 +80,16 @@ namespace BuzzCrawler.Discuz.Tests
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
 
-            var crawler = new DiscuzCrawler(DiscuzVersion.X2, getTestTarget(), null);
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(BBSType.Discuz_v2, getTestTarget());
+            crawler.Should().BeOfType<BuzzCrawler>();
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 var refinedContent = getTrimmedText(result.Content);
-                refinedContent.ShouldBeEquivalentTo("test<span>test</span>", "because hidden div tag was removed");
+                refinedContent.Should().Be("test<span>test</span>", "because hidden div tag was removed");
                 stopWaitHandle.Set();
             };
 
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
 
@@ -110,7 +115,9 @@ namespace BuzzCrawler.Discuz.Tests
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
 
-            var crawler = new DiscuzCrawler(DiscuzVersion.X2, getTestTarget(), null);
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(BBSType.Discuz_v2, getTestTarget());
+            crawler.Should().BeOfType<BuzzCrawler>();
+
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 var refinedContent = getTrimmedText(result.Content);
@@ -118,10 +125,10 @@ namespace BuzzCrawler.Discuz.Tests
                 stopWaitHandle.Set();
             };
 
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
-        
+
         [Fact]
         public void pageCrawlCompleted_unnecessarySignitureText_removed()
         {
@@ -144,7 +151,9 @@ namespace BuzzCrawler.Discuz.Tests
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
 
-            var crawler = new DiscuzCrawler(DiscuzVersion.X2, getTestTarget(), null);
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(BBSType.Discuz_v2, getTestTarget());
+            crawler.Should().BeOfType<BuzzCrawler>();
+
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 var refinedContent = getTrimmedText(result.Content);
@@ -152,7 +161,7 @@ namespace BuzzCrawler.Discuz.Tests
                 stopWaitHandle.Set();
             };
 
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
 
@@ -179,7 +188,9 @@ namespace BuzzCrawler.Discuz.Tests
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
 
-            var crawler = new DiscuzCrawler(DiscuzVersion.X2, getTestTarget(), null);
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(BBSType.Discuz_v2, getTestTarget());
+            crawler.Should().BeOfType<BuzzCrawler>();
+
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 var refinedContent = getTrimmedText(result.Content);
@@ -187,7 +198,7 @@ namespace BuzzCrawler.Discuz.Tests
                 stopWaitHandle.Set();
             };
 
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
 
@@ -217,7 +228,8 @@ namespace BuzzCrawler.Discuz.Tests
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
 
-            var crawler = new DiscuzCrawler(DiscuzVersion.X2, getTestTarget(), null);
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(BBSType.Discuz_v2, getTestTarget());
+            crawler.Should().BeOfType<BuzzCrawler>();
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 var refinedContent = getTrimmedText(result.Content);
@@ -225,7 +237,7 @@ namespace BuzzCrawler.Discuz.Tests
                 stopWaitHandle.Set();
             };
 
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
 
@@ -285,7 +297,9 @@ namespace BuzzCrawler.Discuz.Tests
             };
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
-            var crawler = new DiscuzCrawler(DiscuzVersion.X2, getTestTarget(), null);
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(BBSType.Discuz_v2, getTestTarget());
+            crawler.Should().BeOfType<BuzzCrawler>();
+
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 getTrimmedText(result.Content).ShouldBeEquivalentTo(getTrimmedText(expected.Content));
@@ -295,7 +309,7 @@ namespace BuzzCrawler.Discuz.Tests
                 result.WriterId.ShouldBeEquivalentTo(expected.WriterId);
                 stopWaitHandle.Set();
             };
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
 
@@ -343,7 +357,8 @@ namespace BuzzCrawler.Discuz.Tests
             };
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
-            var crawler = new DiscuzCrawler(DiscuzVersion.X3_1, getTestTarget(), null);
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(BBSType.Discuz_v3_1, getTestTarget());
+            crawler.Should().BeOfType<BuzzCrawler>();
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 getTrimmedText(result.Content).ShouldBeEquivalentTo(getTrimmedText(expected.Content));
@@ -353,7 +368,7 @@ namespace BuzzCrawler.Discuz.Tests
                 result.WriterId.ShouldBeEquivalentTo(expected.WriterId);
                 stopWaitHandle.Set();
             };
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
 
@@ -473,14 +488,18 @@ namespace BuzzCrawler.Discuz.Tests
             };
 
             AutoResetEvent stopWaitHandle = new AutoResetEvent(false);
-            var crawler = new DiscuzCrawler(
-                DiscuzVersion.X3_2, 
-                new CrawleTarget(
-                    "http://dnf.gamebbs.qq.com/forum.php?mod=viewthread&tid=&extra=page%3D1%26filter%3Dauthor%26orderby%3Ddateline", "tid",
-                    "http://dnf.gamebbs.qq.com/forum.php?mod=forumdisplay&fid=43&orderby=dateline&filter=author&orderby=dateline&page=", "page",
+
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(
+                BBSType.Discuz_v3_2,
+                new BBSCrawleTarget(
+                    "http://dnf.gamebbs.qq.com/forum.php?mod=viewthread&tid=&extra=page%3D1%26filter%3Dauthor%26orderby%3Ddateline", 
+                    "tid",
+                    "http://dnf.gamebbs.qq.com/forum.php?mod=forumdisplay&fid=43&orderby=dateline&filter=author&orderby=dateline&page=", 
+                    "page",
                     "43",
-                    "fid"), 
-                null);
+                    "fid"));
+            crawler.Should().BeOfType<BuzzCrawler>();
+
             crawler.OnNewBuzzCrawled += (result) =>
             {
                 getTrimmedText(result.Content).ShouldBeEquivalentTo(getTrimmedText(expected.Content));
@@ -490,7 +509,7 @@ namespace BuzzCrawler.Discuz.Tests
                 result.WriterId.ShouldBeEquivalentTo(expected.WriterId);
                 stopWaitHandle.Set();
             };
-            crawler.pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
+            (crawler as BuzzCrawler).pageCrawlCompleted(null, new Abot.Crawler.PageCrawlCompletedArgs(new CrawlContext(), crawledPage));
             stopWaitHandle.WaitOne();
         }
 

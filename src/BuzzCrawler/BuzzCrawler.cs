@@ -17,27 +17,28 @@ namespace BuzzCrawler
 {
     public class BuzzCrawler : IBuzzCrawler
     {
-        private object _syncRoot = new object();
-        private DateTime? lastestArticleWriteDate;
-        private int crawledCount = 0;
-        private CrawleTarget target;
+        public event Action<int, DateTime?> OnCrawleComplete;
+        public event Action<Buzz> OnNewBuzzCrawled;
+        public Action<IHtmlDocument> DocumentModify;
+
+        private Uri crawleStartUri;
+        private IBuzzParser buzzParser;
         private IHyperLinkParser hyperLinkParser;
         private ICrawleHistoryRepository crawleHistoryRepository;
 
-        protected ElementSelectors selectors;
-        protected Action<IHtmlDocument> documentModify;
+        private int crawledCount = 0;
+        private DateTime? lastestArticleWriteDate;
+        private CrawlConfiguration abotConfig;
+        private object _syncRoot = new object();
 
-        public event Action<int, DateTime?> OnCrawleComplete;
-        public event Action<Buzz> OnNewBuzzCrawled;
-
-        public BuzzCrawler(CrawleTarget target, ElementSelectors selectors, IHyperLinkParser hyperlinkParser = null, ICrawleHistoryRepository crawleHistoryRepository = null, 
-            Action<IHtmlDocument> documentModify = null)
+        public BuzzCrawler(Uri crawleStartUri, IBuzzParser parser, 
+            IHyperLinkParser hyperlinkParser = null, ICrawleHistoryRepository crawleHistoryRepository = null, CrawlConfiguration abotConfig = null)
         {
-            this.target = target;
-            this.selectors = selectors;
+            this.crawleStartUri = crawleStartUri;
+            buzzParser = parser;
             this.hyperLinkParser = hyperlinkParser ?? new AngleSharpHyperlinkParser();
             this.crawleHistoryRepository = crawleHistoryRepository ?? new InMemoryCrawleHistoryRepository();
-            this.documentModify = documentModify;
+            this.abotConfig = abotConfig;
         }
 
         public void Crawle()
@@ -46,11 +47,11 @@ namespace BuzzCrawler
             sw.Start();
             DebugLog("start");
 
-            PoliteWebCrawler crawler = new PoliteWebCrawler(null, null, null, null, null, hyperLinkParser, null, null, null);
+            PoliteWebCrawler crawler = new PoliteWebCrawler(abotConfig, null, null, null, null, hyperLinkParser, null, null, null);
             crawler.ShouldCrawlPage(shouldCrawlPage);
             crawler.PageCrawlCompletedAsync += pageCrawlCompleted;
 
-            CrawlResult result = crawler.Crawl(new Uri(QueryStringHelper.FillQueryString(target.ArticleListUrl, target.PageNoQueryString, "1")));
+            CrawlResult result = crawler.Crawl(crawleStartUri);
             if (result.ErrorOccurred)
             {
                 DebugLog($"Crawl of {result.RootUri.AbsoluteUri} completed with error: {result.ErrorException.Message}");
@@ -67,13 +68,13 @@ namespace BuzzCrawler
         {
             var uri = pageToCrawl.Uri;
 
-            if (isListPage(uri) && isListPageWithinTheScopeOfCrawle(uri))
+            if (buzzParser.IsListPage(uri))
             {
                 DebugLog(uri.AbsoluteUri + " : list page, so crwale");
                 return new CrawlDecision { Allow = true };
             }
 
-            if (isArticlePage(uri) && isArticleWithinTheScopeOfCrawle(uri) && !crawleHistoryRepository.IsAlreadyCrawled(getContentsNo(uri)))
+            if (buzzParser.IsArticlePage(uri) && !crawleHistoryRepository.IsAlreadyCrawled(buzzParser.GetContentsNo(uri)))
             {
                 return new CrawlDecision { Allow = true };
             }
@@ -92,20 +93,17 @@ namespace BuzzCrawler
 
             DebugLog($"pageToCrawl : {crawledPage.Uri.AbsoluteUri}");
 
-            var document = new HtmlParser().Parse(crawledPage.Content.Text);
-            this.documentModify?.Invoke(document);
-
             Buzz crawledBuzz = null;
             try
             {
-                crawledBuzz = getBuzzFromDocument(document, crawledPage.Uri);
+                crawledBuzz = GetBuzzFromDocument(crawledPage.Uri, crawledPage.Content.Text);
             }
             catch (Exception ex)
             {
                 DebugLog($"buzz parsing error. exception:{ex.ToString()}");
                 return;
             }
-            
+
             lock (_syncRoot)
             {
                 if (crawleHistoryRepository.IsAlreadyCrawled(crawledBuzz.ContentsNo))
@@ -122,6 +120,23 @@ namespace BuzzCrawler
             updateLastestArticleWriteDate(crawledBuzz);
         }
 
+        public Buzz GetBuzzFromDocument(Uri uri, string text)
+        {
+            var document = new HtmlParser().Parse(text);
+            this.DocumentModify?.Invoke(document);
+
+            var crawledBuzz = new Buzz()
+            {
+                Content = buzzParser.ContentSelector(document),
+                ContentsNo = buzzParser.GetContentsNo(uri),
+                Link = "",
+                Title = buzzParser.TitleSelector(document),
+                WriteDate = buzzParser.WriteDateSelector(document),
+                WriterId = buzzParser.WriterIdSelector(document)
+            };
+            return crawledBuzz;
+        }
+
         private bool isValid(CrawledPage crawledPage)
         {
             if (crawledPage.WebException != null)
@@ -134,7 +149,7 @@ namespace BuzzCrawler
                 DebugLog($"Crawl of page failed - status {crawledPage.Uri.AbsoluteUri} : {crawledPage.HttpWebResponse.StatusCode.ToString()}");
                 return false;
             }
-            if (isListPage(crawledPage.Uri))
+            if (buzzParser.IsListPage(crawledPage.Uri))
             {
                 DebugLog($"this is list page, so pass analysis: {crawledPage.Uri.AbsoluteUri}");
                 return false;
@@ -148,54 +163,6 @@ namespace BuzzCrawler
                 return false;
             }
             return true;
-        }
-
-        internal bool isListPage(Uri uri)
-        {
-            return
-                Uri.Compare(
-                    new Uri(QueryStringHelper.RemoveQueryStringByKey(uri.AbsoluteUri, target.PageNoQueryString)),
-                    new Uri(QueryStringHelper.RemoveQueryStringByKey(target.ArticleListUrl, target.PageNoQueryString)),
-                    UriComponents.Host | UriComponents.PathAndQuery,
-                    UriFormat.SafeUnescaped,
-                    StringComparison.OrdinalIgnoreCase) == 0;
-        }
-
-        private bool isListPageWithinTheScopeOfCrawle(Uri uri)
-        {
-            var pageNo = int.Parse(HttpUtility.ParseQueryString(uri.Query).Get(target.PageNoQueryString));
-            return target.MaxListPageNo >= pageNo;
-        }
-
-        private bool isArticlePage(Uri uri)
-        {
-            var isArticlePage = uri.AbsoluteUri.StartsWith(target.ArticleUrl);
-            var isArticlePageWithComments = uri.AbsoluteUri.Contains("&page=");
-            return isArticlePage && !isArticlePageWithComments;
-        }
-
-        private bool isArticleWithinTheScopeOfCrawle(Uri uri)
-        {
-            return target.StartArticleNo <= getContentsNo(uri);
-        }
-
-        private Buzz getBuzzFromDocument(IHtmlDocument document, Uri uri)
-        {
-            var crawledBuzz = new Buzz()
-            {
-                Content = document.QuerySelector(selectors.ContentSelector)?.InnerHtml.Trim(),
-                ContentsNo = getContentsNo(uri),
-                Link = "",
-                Title = document.QuerySelectorAll(selectors.TitleSelector).FirstOrDefault()?.InnerHtml.Trim(),
-                WriteDate = selectors.WriteDateSelector(document),
-                WriterId = document.QuerySelectorAll(selectors.WriterIdSelector).First().InnerHtml
-            };
-            return crawledBuzz;
-        }
-
-        private int getContentsNo(Uri uri)
-        {
-            return int.Parse(HttpUtility.ParseQueryString(uri.Query).Get(target.ArticleNoQueryString));
         }
 
         private void updateLastestArticleWriteDate(Buzz crawledResult)

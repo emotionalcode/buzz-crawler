@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BuzzCrawler
 {
-    public class CrawleTarget
+    public class BBSCrawleTarget
     {
         private string articleUrl;
         private string listUrl;
@@ -36,7 +36,7 @@ namespace BuzzCrawler
         public int MaxListPageNo { get; set; }
         public int StartArticleNo { get; set; }
 
-        public CrawleTarget(string articleUrl, string articleNoQuerystring, string listUrl, string pageNoQuerystring, string forumId, string forumIdQuerystring, int maxListPageNo = 10, int startArticleNo = 0)
+        public BBSCrawleTarget(string articleUrl, string articleNoQuerystring, string listUrl, string pageNoQuerystring, string forumId, string forumIdQuerystring, int maxListPageNo = 10, int startArticleNo = 0)
         {
             this.articleUrl = articleUrl;
             this.listUrl = listUrl;

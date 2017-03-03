@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 
-
 namespace BuzzCrawler.Tests
 {
     public class JavascriptLinkParserTest
     {
-        private CrawleTarget target = new CrawleTarget(
+        private BBSCrawleTarget target = new BBSCrawleTarget(
                 "http://www.test.com/view.php?q1=v1&f=&articleNo=",
                 "articleNo",
                 "http://www.test.com/list.php?q1=v1&f=&pageNo=",
@@ -52,7 +51,7 @@ namespace BuzzCrawler.Tests
                             </div></body></html>"
                 }
             });
-            
+
             parsedLinks.Should().BeEquivalentTo(expected);
         }
 
@@ -75,7 +74,7 @@ namespace BuzzCrawler.Tests
                             </div></body></html>"
                 }
             });
-           
+
             parsedLinks.Should().BeEquivalentTo(expected);
         }
 
@@ -101,7 +100,7 @@ namespace BuzzCrawler.Tests
                             </div></body></html>"
                 }
             });
-            
+
             parsedLinks.Should().BeEquivalentTo(expected);
         }
 
@@ -140,7 +139,7 @@ namespace BuzzCrawler.Tests
                             </body></html>"
                 }
             });
-            
+
             parsedLinks.Should().BeEquivalentTo(expected);
         }
     }
