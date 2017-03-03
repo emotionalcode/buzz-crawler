@@ -21,8 +21,8 @@ namespace BuzzCrawler.Discuz.Tests
                 articleNoQuerystring: "articleNo",
                 listUrl: "http://www.discuzsample.com/list.php?forumId=&pageNo=",
                 pageNoQuerystring: "pageNo",
-                forumId: "testForum",
-                forumIdQuerystring: "forumId",
+                bbsInstanceKey: "testForum",
+                bbsInstanceKeyQuerystring: "forumId",
                 maxListPageNo: maxListPageNo,
                 startArticleNo: startArticleNo);
         }

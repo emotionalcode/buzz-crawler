@@ -11,14 +11,14 @@ namespace BuzzCrawler
     {
         private string articleUrl;
         private string listUrl;
-        private string forumId;
-        private string forumIdQuerystring;
+        private string bbsInstanceKey;
+        private string bbsInstanceKeyQuerystring;
 
         public string ArticleUrl
         {
             get
             {
-                return QueryStringHelper.FillQueryString(articleUrl, forumIdQuerystring, forumId);
+                return QueryStringHelper.FillQueryString(articleUrl, bbsInstanceKeyQuerystring, bbsInstanceKey);
             }
         }
 
@@ -26,7 +26,7 @@ namespace BuzzCrawler
         {
             get
             {
-                return QueryStringHelper.FillQueryString(listUrl, forumIdQuerystring, forumId);
+                return QueryStringHelper.FillQueryString(listUrl, bbsInstanceKeyQuerystring, bbsInstanceKey);
             }
         }
 
@@ -36,12 +36,12 @@ namespace BuzzCrawler
         public int MaxListPageNo { get; set; }
         public int StartArticleNo { get; set; }
 
-        public BBSCrawleTarget(string articleUrl, string articleNoQuerystring, string listUrl, string pageNoQuerystring, string forumId, string forumIdQuerystring, int maxListPageNo = 10, int startArticleNo = 0)
+        public BBSCrawleTarget(string articleUrl, string articleNoQuerystring, string listUrl, string pageNoQuerystring, string bbsInstanceKey, string bbsInstanceKeyQuerystring, int maxListPageNo = 10, int startArticleNo = 0)
         {
             this.articleUrl = articleUrl;
             this.listUrl = listUrl;
-            this.forumId = forumId;
-            this.forumIdQuerystring = forumIdQuerystring;
+            this.bbsInstanceKey = bbsInstanceKey;
+            this.bbsInstanceKeyQuerystring = bbsInstanceKeyQuerystring;
 
             ArticleNoQueryString = articleNoQuerystring;
             PageNoQueryString = pageNoQuerystring;

@@ -40,8 +40,8 @@ namespace BuzzCrawler.Sample
                     articleNoQuerystring: "tid",
                     listUrl: "http://bbs.duowan.com/forum.php?mod=forumdisplay&fid=&orderby=dateline&filter=author&page=",
                     pageNoQuerystring: "page",
-                    forumId: "774",
-                    forumIdQuerystring: "fid",
+                    bbsInstanceKey: "774",
+                    bbsInstanceKeyQuerystring: "fid",
                     maxListPageNo: 999,
                     startArticleNo: 45480215));
             duowanCrawler.OnCrawleComplete += (crawledCount, lastBuzzWriteDate) => Console.WriteLine($"crawled complete. {crawledCount} buzz crawled. last writedate is {lastBuzzWriteDate}");
@@ -58,8 +58,8 @@ namespace BuzzCrawler.Sample
                     articleNoQuerystring: "tid",
                     listUrl: "http://bbs.colg.cn/forum.php?mod=forumdisplay&fid=&orderby=dateline&filter=author&page=",
                     pageNoQuerystring: "page",
-                    forumId: "171",
-                    forumIdQuerystring: "fid",
+                    bbsInstanceKey: "171",
+                    bbsInstanceKeyQuerystring: "fid",
                     maxListPageNo: 999,
                     startArticleNo: 5836878));
             colgCrawler.OnCrawleComplete += (crawledCount, lastBuzzWriteDate) => Console.WriteLine($"crawled complete. {crawledCount} buzz crawled. last writedate is {lastBuzzWriteDate}");
@@ -76,8 +76,8 @@ namespace BuzzCrawler.Sample
                     articleNoQuerystring: "tid",
                     listUrl: "http://dnf.gamebbs.qq.com/forum.php?mod=forumdisplay&fid=&orderby=dateline&filter=author&page=",
                     pageNoQuerystring: "page",
-                    forumId: "43",
-                    forumIdQuerystring: "fid",
+                    bbsInstanceKey: "43",
+                    bbsInstanceKeyQuerystring: "fid",
                     maxListPageNo: 999,
                     startArticleNo: 117805));
             qqCrawler.OnCrawleComplete += (crawledCount, lastBuzzWriteDate) => Console.WriteLine($"crawled complete. {crawledCount} buzz crawled. last writedate is {lastBuzzWriteDate}");
@@ -94,9 +94,9 @@ namespace BuzzCrawler.Sample
                     articleNoQuerystring: "pid",
                     listUrl: "http://www.hungryapp.co.kr/bbs/list.php?bcode=&page=",
                     pageNoQuerystring: "page",
-                    forumId: "dnfsoul",
+                    bbsInstanceKey: "dnfsoul",
                     maxListPageNo: 999,
-                    forumIdQuerystring: "bcode",
+                    bbsInstanceKeyQuerystring: "bcode",
                     startArticleNo: 4781));
             hungryAppCrawler.OnCrawleComplete += (crawledCount, lastBuzzWriteDate) => Console.WriteLine($"crawled complete. {crawledCount} buzz crawled. last writedate is {lastBuzzWriteDate}");
             hungryAppCrawler.OnNewBuzzCrawled += buzz => Console.WriteLine($"buzz crawled{Environment.NewLine}{JsonConvert.SerializeObject(buzz)}");

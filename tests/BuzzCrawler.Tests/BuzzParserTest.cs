@@ -18,8 +18,8 @@ namespace BuzzCrawler.Tests
             articleNoQuerystring: "tid",
             listUrl: "http://bbs.dizcuzsample.com/forum.php?mod=forumdisplay&fid=&orderby=dateline&filter=author&page=",
             pageNoQuerystring: "page",
-            forumId: "333",
-            forumIdQuerystring: "fid",
+            bbsInstanceKey: "333",
+            bbsInstanceKeyQuerystring: "fid",
             maxListPageNo: 999,
             startArticleNo: 10
         );
