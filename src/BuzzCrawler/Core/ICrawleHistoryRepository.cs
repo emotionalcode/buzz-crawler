@@ -8,7 +8,7 @@ namespace BuzzCrawler
 {
     public interface ICrawleHistoryRepository
     {
-        bool IsAlreadyCrawled(long articleNo);
-        void SetCrawleComplete(long articleNo);
+        bool IsAlreadyCrawled(long identifier);
+        void SetCrawleComplete(long identifier);
     }
 }

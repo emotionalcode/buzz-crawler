@@ -15,11 +15,11 @@ namespace BuzzCrawler
 {
     public class JavascriptLinkParser : IHyperLinkParser
     {
-        private CrawleTarget target { get; set; }
+        private BBSCrawleTarget target { get; set; }
         private JavascriptLinkSelectors linkSelectors { get; set; }
         private int pagerButtonCount { get; set; }
 
-        public JavascriptLinkParser(CrawleTarget target, JavascriptLinkSelectors linkSelectors, int pagerButtonCount)
+        public JavascriptLinkParser(BBSCrawleTarget target, JavascriptLinkSelectors linkSelectors, int pagerButtonCount)
         {
             this.target = target;
             this.linkSelectors = linkSelectors;
