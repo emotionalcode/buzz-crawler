@@ -14,7 +14,7 @@ namespace BuzzCrawler.Sample
     {
         static void Main(string[] args)
         {
-            crawleDuowanSite();
+            //crawleDuowanSite();
 
             //crawleColgSite();
 
@@ -25,6 +25,10 @@ namespace BuzzCrawler.Sample
             //crawleShitarabaSite();
 
             //crawleNaverBlog();
+
+            //crawleInven();
+
+            //crawle17173Site();
 
             Console.ReadLine();
         }
@@ -85,6 +89,24 @@ namespace BuzzCrawler.Sample
             qqCrawler.Crawle();
         }
 
+        private static void crawle17173Site()
+        {
+            var crawler = BuzzCrawlerFactory.GetBBSCrawler(
+                BBSType.Discuz_v3_2,
+                new BBSCrawleTarget(
+                    articleUrl: "http://bbs.17173.com/forum.php?mod=viewthread&tid=",
+                    articleNoQuerystring: "tid",
+                    listUrl: "http://bbs.17173.com/forum.php?mod=forumdisplay&fid=&orderby=dateline&filter=author&page=",
+                    pageNoQuerystring: "page",
+                    bbsInstanceKey: "8705",
+                    bbsInstanceKeyQuerystring: "fid",
+                    maxListPageNo: 999,
+                    startArticleNo: 10863801));
+            crawler.OnCrawleComplete += (crawledCount, lastBuzzWriteDate) => Console.WriteLine($"crawled complete. {crawledCount} buzz crawled. last writedate is {lastBuzzWriteDate}");
+            crawler.OnNewBuzzCrawled += buzz => Console.WriteLine($"buzz crawled{Environment.NewLine}{JsonConvert.SerializeObject(buzz)}");
+            crawler.Crawle();
+        }
+
         private static void crawleHungryAppSite()
         {
             var hungryAppCrawler = BuzzCrawlerFactory.GetBBSCrawler(
@@ -94,7 +116,7 @@ namespace BuzzCrawler.Sample
                     articleNoQuerystring: "pid",
                     listUrl: "http://www.hungryapp.co.kr/bbs/list.php?bcode=&page=",
                     pageNoQuerystring: "page",
-                    bbsInstanceKey: "dnfsoul",
+                    bbsInstanceKey: "xxx",
                     maxListPageNo: 999,
                     bbsInstanceKeyQuerystring: "bcode",
                     startArticleNo: 4781));
@@ -119,5 +141,22 @@ namespace BuzzCrawler.Sample
             crawler.Crawle();
         }
 
+        private static void crawleInven()
+        {
+            var hungryAppCrawler = BuzzCrawlerFactory.GetBBSCrawler(
+               BBSType.Inven,
+               new BBSCrawleTarget(
+                   articleUrl: "http://www.inven.co.kr/board/powerbbs.php?come_idx=&l=",
+                   articleNoQuerystring: "l",
+                   listUrl: "http://www.inven.co.kr/board/powerbbs.php?come_idx=&sort=PID&p=",
+                   pageNoQuerystring: "p",
+                   bbsInstanceKey: "come_idx",
+                   maxListPageNo: 999,
+                   bbsInstanceKeyQuerystring: "5165",
+                   startArticleNo: 4781));
+            hungryAppCrawler.OnCrawleComplete += (crawledCount, lastBuzzWriteDate) => Console.WriteLine($"crawled complete. {crawledCount} buzz crawled. last writedate is {lastBuzzWriteDate}");
+            hungryAppCrawler.OnNewBuzzCrawled += buzz => Console.WriteLine($"buzz crawled{Environment.NewLine}{JsonConvert.SerializeObject(buzz)}");
+            hungryAppCrawler.Crawle();
+        }
     }
 }

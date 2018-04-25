@@ -104,6 +104,23 @@ namespace BuzzCrawler
                             PagerNextElementText = "다음"
                         }, 10),
                         crawleHistoryRepository: crawleHistoryRepository);
+                case BBSType.Inven:
+                    return new BuzzCrawler(
+                        new Uri(QueryStringHelper.FillQueryString(target.ArticleListUrl, target.PageNoQueryString, "1")),
+                        new BBSParser(
+                            target,
+                            ContentSelector: d => { return d.QuerySelector("#powerbbsContent")?.InnerHtml.Trim(); },
+                            TitleSelector: d => { return d.QuerySelector(".articleTitle")?.InnerHtml.Trim(); },
+                            WriteDateSelector: d => { return DateTime.Parse(d.QuerySelector(".articleDate")?.InnerHtml.Trim()); },
+                            WriterIdSelector: d => { return d.QuerySelector(".articleWriter span")?.InnerHtml.Trim(); }),
+                        new JavascriptLinkParser(target, new JavascriptLinkSelectors()
+                        {
+                            ArticleLinkElementSelector = ".tablef .td02 a",
+                            ArticleLinkJavascriptFunctionName = "page",
+                            PagerElementSelector = ".ppaging a",
+                            PagerNextElementText = "다음"
+                        }, 10),
+                        crawleHistoryRepository: crawleHistoryRepository);
                 default:
                     throw new Exception($"{version} is not supported");
             }
@@ -152,6 +169,7 @@ namespace BuzzCrawler
         /// ex) qq
         /// </summary>
         Discuz_v3_2,
-        HungryApp
+        HungryApp,
+        Inven
     }
 }

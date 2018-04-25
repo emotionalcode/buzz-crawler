@@ -66,7 +66,8 @@ namespace BuzzCrawler
         {
             var isArticlePage = uri.AbsoluteUri.StartsWith(target.ArticleUrl);
             var isArticlePageWithComments = uri.AbsoluteUri.Contains("&page=");
-            return isArticlePage && !isArticlePageWithComments;
+            var isFromAlbum = uri.AbsoluteUri.Contains("&from=album");
+            return isArticlePage && !isArticlePageWithComments && !isFromAlbum;
         }
 
         private bool isArticleWithinTheScopeOfCrawle(Uri uri)

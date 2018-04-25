@@ -3,15 +3,9 @@ using Abot.Crawler;
 using Abot.Poco;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
-using BuzzCrawler.Infrastructure;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace BuzzCrawler
 {
@@ -124,17 +118,24 @@ namespace BuzzCrawler
         {
             var document = new HtmlParser().Parse(text);
             this.DocumentModify?.Invoke(document);
-
-            var crawledBuzz = new Buzz()
+            try
             {
-                Content = buzzParser.ContentSelector(document),
-                ContentsNo = buzzParser.GetContentsNo(uri),
-                Link = "",
-                Title = buzzParser.TitleSelector(document),
-                WriteDate = buzzParser.WriteDateSelector(document),
-                WriterId = buzzParser.WriterIdSelector(document)
-            };
-            return crawledBuzz;
+                var crawledBuzz = new Buzz()
+                {
+                    Content = buzzParser.ContentSelector(document),
+                    ContentsNo = buzzParser.GetContentsNo(uri),
+                    Link = "",
+                    Title = buzzParser.TitleSelector(document),
+                    WriteDate = buzzParser.WriteDateSelector(document),
+                    WriterId = buzzParser.WriterIdSelector(document)
+                };
+                return crawledBuzz;
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"buzz parsing error. uri:{uri.AbsoluteUri}{Environment.NewLine} exception:{ex.ToString()}");
+                throw ex;
+            }
         }
 
         private bool isValid(CrawledPage crawledPage)
