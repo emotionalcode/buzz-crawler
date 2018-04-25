@@ -38,4 +38,3 @@ crawler.Crawle();
 ```
 
 for more information, please watch [this video](https://www.youtube.com/watch?v=DEFU0ZrWBhA)
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/DEFU0ZrWBhA/0.jpg)](https://www.youtube.com/watch?v=DEFU0ZrWBhA)
